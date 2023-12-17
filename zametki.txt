@@ -1,0 +1,126 @@
+django-admin startproject myproject config .
+python manage.py startapp MyApp
+
+1. В файле MyApp/models.py определим модели Bacteria, Fungi и Microorganisms:
+from django.db import models
+
+class Bacteria(models.Model):
+    properties = models.CharField(max_length=300)
+    type = models.CharField(max_length=300)
+    size = models.IntegerField()
+
+class Fungi(models.Model):
+    properties = models.CharField(max_length=300)
+    type = models.CharField(max_length=200)
+    size = models.IntegerField()
+
+class Microorganisms(models.Model):
+    bacteria = models.ForeignKey(Bacteria, on_delete=models.CASCADE)
+    fungi = models.OneToOneField(Fungi, on_delete=models.CASCADE)
+    name = models.CharField(max_length=200)
+
+#Терминал
+cd /home/hello/Desktop/Task15_django
+python3 manage.py makemigrations
+python3 manage.py migrate
+python3 manage.py shell
+
+2. Получение всех объектов модели:
+
+from MyApp.models import Bacteria, Fungi, Microorganisms
+
+all_bacteria = Bacteria.objects.all()
+print(all_bacteria)
+
+all_fungi = Fungi.objects.all()
+print(all_fungi)
+
+all_microorganisms = Microorganisms.objects.all()
+print(all_microorganisms)
+
+3. Фильтрация:
+
+from MyApp.models import Fungi
+
+fungi_filtered_by_size = Fungi.objects.filter(size__gt=250)
+print(fungi_filtered_by_size)
+
+4. Использование связанных моделей с помощью related_name и related_query_name.
+
+from MyApp.models import Bacteria, Fungi
+
+#related_name 
+bacteria = Bacteria.objects.first()
+related_fungi = bacteria.samples.all()
+print(related_fungi)
+
+# related_query_name
+fungi = Fungi.objects.first()
+related_sample = fungi.sample.all()
+print(related_sample)
+
+5. Создание новых объектов модели:
+
+from MyApp.models import Bacteria, Fungi, Microorganisms
+
+new_bacteria = Bacteria.objects.create(properties="Some properties", type="Type A", size=200)
+
+new_fungi = Fungi.objects.create(properties="Some properties", type="Type X", size=300)
+
+new_microorganism = Microorganisms.objects.create(bacteria=new_bacteria, fungi=new_fungi, name="Microorganism 1")
+
+6. Обновление существующих объектов:
+
+from MyApp.models import Bacteria
+
+bacteria = Bacteria.objects.get(pk=1)
+bacteria.size = 500
+bacteria.save()
+
+7. Удаление объектов:
+
+from MyApp.models import Fungi
+
+fungi = Fungi.objects.get(pk=1)
+fungi.delete()
+
+8. Использование агрегирующих функций:
+
+from MyApp.models import Bacteria
+
+bacteria_count = Bacteria.objects.count()
+print(bacteria_count)
+
+9. Использование операторов сравнения:
+
+from MyApp.models import Bacteria
+
+bacteria_filtered_by_size = Bacteria.objects.filter(size__gt=100)
+print(bacteria_filtered_by_size)
+
+10. Работа с ManyToManyField:
+
+from MyApp.models import Bacteria, Fungi, Microorganisms
+
+- Получение микроорганизмов, связанных с определенной бактерией 
+
+bacteria = Bacteria.objects.first()
+related_microorganisms = bacteria.microorganisms.all()
+print(related_microorganisms)
+
+- Добавление нового микроорганизма к бактерии
+
+new_microorganism = Microorganisms.objects.create(bacteria=bacteria, fungi=Fungi.objects.first(), name="New Microorganism")
+bacteria.microorganisms.add(new_microorganism)
+
+11. Работа с OneToOneField:
+
+from MyApp.models import Fungi, Microorganisms
+
+- Получение микроорганизма и связанного гриба через OneToOneField
+
+microorganism = Microorganisms.objects.first()
+related_fungi = microorganism.fungi
+print(related_fungi)
+
+Завершите работу в оболочке с помощью команды exit()
